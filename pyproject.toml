@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "music-store-assistant-langgraph"
+version = "0.1.0"
+description = ""
+authors = ["Samir Kerroumi <samir.kerr@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+chainlit = "1.1.402"
+langchain = "0.2.12"
+langchain-openai = "0.1.21"
+langchain-anthropic = "0.1.22"
+langchain-google-genai = "1.0.8"
+langchain-experimental = "0.0.64"
+langgraph = "0.2.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
