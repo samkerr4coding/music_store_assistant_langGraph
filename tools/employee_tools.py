@@ -1,7 +1,5 @@
 from langchain_core.tools import tool
-
 from utils.db_util import execute_query
-
 
 @tool
 def get_employee_by_id(employee_id: int) -> list:
@@ -14,10 +12,9 @@ def get_employee_by_id(employee_id: int) -> list:
     Returns:
         list: A list of employee records matching the given ID.
     """
-    query = f"SELECT * FROM Employee WHERE EmployeeId = {employee_id}"
+    query = f"SELECT * FROM employee WHERE employee_id = {employee_id}"
     result = execute_query(query)
     return result
-
 
 @tool
 def get_employees_by_name(employee_name: str) -> list:
@@ -31,12 +28,11 @@ def get_employees_by_name(employee_name: str) -> list:
         list: A list of employees whose names match the given string.
     """
     query = f"""
-        SELECT * FROM Employee
-        WHERE FirstName LIKE '%{employee_name}%' OR LastName LIKE '%{employee_name}%'
+        SELECT * FROM employee
+        WHERE first_name LIKE '%{employee_name}%' OR last_name LIKE '%{employee_name}%'
     """
     result = execute_query(query)
     return result
-
 
 @tool
 def insert_employee(last_name: str, first_name: str, title: str, reports_to: int, birth_date: str, hire_date: str,
@@ -62,11 +58,10 @@ def insert_employee(last_name: str, first_name: str, title: str, reports_to: int
         email (str): The email address of the employee.
     """
     query = f"""
-        INSERT INTO Employee (LastName, FirstName, Title, ReportsTo, BirthDate, HireDate, Address, City, State, Country, PostalCode, Phone, Fax, Email)
+        INSERT INTO employee (last_name, first_name, title, reports_to, birth_date, hire_date, address, city, state, country, postal_code, phone, fax, email)
         VALUES ('{last_name}', '{first_name}', '{title}', {reports_to}, '{birth_date}', '{hire_date}', '{address}', '{city}', '{state}', '{country}', '{postal_code}', '{phone}', '{fax}', '{email}')
     """
     execute_query(query)
-
 
 @tool
 def update_employee(employee_id: int, last_name: str, first_name: str, title: str, reports_to: int, birth_date: str,
@@ -93,12 +88,11 @@ def update_employee(employee_id: int, last_name: str, first_name: str, title: st
         email (str): The new email address of the employee.
     """
     query = f"""
-        UPDATE Employee
-        SET LastName = '{last_name}', FirstName = '{first_name}', Title = '{title}', ReportsTo = {reports_to}, BirthDate = '{birth_date}', HireDate = '{hire_date}', Address = '{address}', City = '{city}', State = '{state}', Country = '{country}', PostalCode = '{postal_code}', Phone = '{phone}', Fax = '{fax}', Email = '{email}'
-        WHERE EmployeeId = {employee_id}
+        UPDATE employee
+        SET last_name = '{last_name}', first_name = '{first_name}', title = '{title}', reports_to = {reports_to}, birth_date = '{birth_date}', hire_date = '{hire_date}', address = '{address}', city = '{city}', state = '{state}', country = '{country}', postal_code = '{postal_code}', phone = '{phone}', fax = '{fax}', email = '{email}'
+        WHERE employee_id = {employee_id}
     """
     execute_query(query)
-
 
 @tool
 def delete_employee(employee_id: int) -> None:
@@ -108,5 +102,5 @@ def delete_employee(employee_id: int) -> None:
     Args:
         employee_id (int): The ID of the employee to delete.
     """
-    query = f"DELETE FROM Employee WHERE EmployeeId = {employee_id}"
+    query = f"DELETE FROM employee WHERE employee_id = {employee_id}"
     execute_query(query)

@@ -1,0 +1,54 @@
+version: "3.8"
+
+services:
+  # Local LLM Service
+  ollama:
+      container_name: ollama
+      env_file:
+        - .env
+      build:
+        context: .
+        dockerfile: Dockerfile.ollama
+      ports:
+        - "11434:11434"
+      volumes:
+        - ./ollama/ollama:/root/.ollama
+      pull_policy: always
+      tty: true
+      restart: always
+      networks:
+        - custom_network
+
+  db:
+      container_name: db
+      image: postgres:14.1-alpine
+      restart: always
+      environment:
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=postgres
+      ports:
+        - '5432:5432'
+      volumes:
+        - db:/var/lib/postgresql/data
+        - ./db-init/db.sql:/docker-entrypoint-initdb.d/db.sql
+
+  # Python Application Service
+  app:
+    build: .  # Build the context from current directory
+    ports:
+      - "8000:8000"  # Port for your application (adjust if needed)
+    depends_on:
+      - db
+    volumes:
+      - ./:/app  # Mount your application directory
+    command: python app.py
+
+volumes:
+  db:
+    driver: local
+
+
+
+networks:
+  custom_network:
+    name : custom_network

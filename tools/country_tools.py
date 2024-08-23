@@ -1,7 +1,5 @@
 from langchain_core.tools import tool
-
 from utils.db_util import execute_query
-
 
 @tool
 def get_country_by_id(country_id: int) -> list:
@@ -14,10 +12,9 @@ def get_country_by_id(country_id: int) -> list:
     Returns:
         list: A list of country records matching the given ID.
     """
-    query = f"SELECT * FROM Country WHERE CountryId = {country_id}"
+    query = f"SELECT * FROM country WHERE country_id = {country_id}"
     result = execute_query(query)
     return result
-
 
 @tool
 def get_countries_by_name(country_name: str) -> list:
@@ -31,12 +28,11 @@ def get_countries_by_name(country_name: str) -> list:
         list: A list of countries whose names match the given string.
     """
     query = f"""
-        SELECT * FROM Country
-        WHERE Name LIKE '%{country_name}%'
+        SELECT * FROM country
+        WHERE name LIKE '%{country_name}%'
     """
     result = execute_query(query)
     return result
-
 
 @tool
 def insert_country(name: str) -> None:
@@ -47,11 +43,10 @@ def insert_country(name: str) -> None:
         name (str): The name of the new country.
     """
     query = f"""
-        INSERT INTO Country (Name)
+        INSERT INTO country (name)
         VALUES ('{name}')
     """
     execute_query(query)
-
 
 @tool
 def update_country(country_id: int, name: str) -> None:
@@ -63,12 +58,11 @@ def update_country(country_id: int, name: str) -> None:
         name (str): The new name of the country.
     """
     query = f"""
-        UPDATE Country
-        SET Name = '{name}'
-        WHERE CountryId = {country_id}
+        UPDATE country
+        SET name = '{name}'
+        WHERE country_id = {country_id}
     """
     execute_query(query)
-
 
 @tool
 def delete_country(country_id: int) -> None:
@@ -78,5 +72,5 @@ def delete_country(country_id: int) -> None:
     Args:
         country_id (int): The ID of the country to delete.
     """
-    query = f"DELETE FROM Country WHERE CountryId = {country_id}"
+    query = f"DELETE FROM country WHERE country_id = {country_id}"
     execute_query(query)

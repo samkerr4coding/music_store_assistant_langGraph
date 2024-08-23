@@ -1,7 +1,5 @@
 from langchain_core.tools import tool
-
 from utils.db_util import execute_query
-
 
 @tool
 def get_artist_by_id(artist_id: int) -> list:
@@ -14,10 +12,9 @@ def get_artist_by_id(artist_id: int) -> list:
     Returns:
         list: A list of artist records matching the given ID.
     """
-    query = f"SELECT * FROM Artist WHERE ArtistId = {artist_id}"
+    query = f"SELECT * FROM artist WHERE artist_id = {artist_id}"
     result = execute_query(query)
     return result
-
 
 @tool
 def get_artist_by_name(artist_name: str) -> list:
@@ -31,12 +28,11 @@ def get_artist_by_name(artist_name: str) -> list:
         list: A list of artist records whose names match the given string.
     """
     query = f"""
-        SELECT * FROM Artist
-        WHERE Name LIKE '%{artist_name}%'
+        SELECT * FROM artist
+        WHERE name LIKE '%{artist_name}%'
     """
     result = execute_query(query)
     return result
-
 
 @tool
 def insert_artist(name: str) -> None:
@@ -47,11 +43,10 @@ def insert_artist(name: str) -> None:
         name (str): The name of the artist.
     """
     query = f"""
-        INSERT INTO Artist (Name)
+        INSERT INTO artist (name)
         VALUES ('{name}')
     """
     execute_query(query)
-
 
 @tool
 def update_artist(artist_id: int, name: str) -> None:
@@ -63,12 +58,11 @@ def update_artist(artist_id: int, name: str) -> None:
         name (str): The new name of the artist.
     """
     query = f"""
-        UPDATE Artist
-        SET Name = '{name}'
-        WHERE ArtistId = {artist_id}
+        UPDATE artist
+        SET name = '{name}'
+        WHERE artist_id = {artist_id}
     """
     execute_query(query)
-
 
 @tool
 def delete_artist(artist_id: int) -> None:
@@ -78,5 +72,5 @@ def delete_artist(artist_id: int) -> None:
     Args:
         artist_id (int): The ID of the artist to delete.
     """
-    query = f"DELETE FROM Artist WHERE ArtistId = {artist_id}"
+    query = f"DELETE FROM artist WHERE artist_id = {artist_id}"
     execute_query(query)

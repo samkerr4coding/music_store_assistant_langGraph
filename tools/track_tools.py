@@ -1,14 +1,12 @@
 from langchain.tools import tool
-
 from utils.db_util import execute_query
-
 
 @tool
 def get_track_by_id(track_id: int) -> list:
     """
     Retrieve a track from the database based on its ID.
     """
-    query = f"SELECT * FROM Track WHERE TrackId = {track_id}"
+    query = f"SELECT * FROM track WHERE track_id = {track_id}"
     result = execute_query(query)
     return result
 
@@ -18,10 +16,10 @@ def get_tracks_by_album_title(album_title: str) -> list:
     Retrieve all tracks from the database that belong to albums with titles matching the given string.
     """
     query = f"""
-        SELECT Track.*
-        FROM Track
-        JOIN Album ON Track.AlbumId = Album.AlbumId
-        WHERE Album.Title LIKE '%{album_title}%'
+        SELECT track.*
+        FROM track
+        JOIN album ON track.album_id = album.album_id
+        WHERE album.title LIKE '%{album_title}%'
     """
     result = execute_query(query)
     return result
@@ -32,11 +30,11 @@ def get_tracks_by_artist_name(artist_name: str) -> list:
     Retrieve all tracks from the database by artists whose names match the given string.
     """
     query = f"""
-        SELECT Track.*
-        FROM Track
-        JOIN Album ON Track.AlbumId = Album.AlbumId
-        JOIN Artist ON Album.ArtistId = Artist.ArtistId
-        WHERE Artist.Name LIKE '%{artist_name}%'
+        SELECT track.*
+        FROM track
+        JOIN album ON track.album_id = album.album_id
+        JOIN artist ON album.artist_id = artist.artist_id
+        WHERE artist.name LIKE '%{artist_name}%'
     """
     result = execute_query(query)
     return result
@@ -48,7 +46,7 @@ def insert_track(name: str, album_id: int, media_type_id: int, genre_id: int, co
     Insert a new track into the database.
     """
     query = f"""
-        INSERT INTO Track (Name, AlbumId, MediaTypeId, GenreId, Composer, Milliseconds, Bytes, UnitPrice)
+        INSERT INTO track (name, album_id, media_type_id, genre_id, composer, milliseconds, bytes, unit_price)
         VALUES ('{name}', {album_id}, {media_type_id}, {genre_id}, '{composer}', {milliseconds}, {bytes}, {unit_price})
     """
     execute_query(query)
@@ -60,9 +58,9 @@ def update_track(track_id: int, name: str, album_id: int, media_type_id: int, ge
     Update an existing track in the database based on its ID.
     """
     query = f"""
-        UPDATE Track
-        SET Name = '{name}', AlbumId = {album_id}, MediaTypeId = {media_type_id}, GenreId = {genre_id}, Composer = '{composer}', Milliseconds = {milliseconds}, Bytes = {bytes}, UnitPrice = {unit_price}
-        WHERE TrackId = {track_id}
+        UPDATE track
+        SET name = '{name}', album_id = {album_id}, media_type_id = {media_type_id}, genre_id = {genre_id}, composer = '{composer}', milliseconds = {milliseconds}, bytes = {bytes}, unit_price = {unit_price}
+        WHERE track_id = {track_id}
     """
     execute_query(query)
 
@@ -71,5 +69,5 @@ def delete_track(track_id: int) -> None:
     """
     Delete a track from the database based on its ID.
     """
-    query = f"DELETE FROM Track WHERE TrackId = {track_id}"
+    query = f"DELETE FROM track WHERE track_id = {track_id}"
     execute_query(query)

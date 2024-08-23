@@ -1,4 +1,12 @@
-# Chainlit Langgraph integration 
+# Chainlit Langgraph integration : a Music store assistant 
+
+## Summary
+
+langgraph 
+langchain tools
+llm
+sqlite chinook db
+chainlit
 
 ## Installation
 

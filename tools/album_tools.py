@@ -1,7 +1,5 @@
 from langchain_core.tools import tool
-
 from utils.db_util import execute_query
-
 
 @tool
 def get_album_by_id(album_id: int) -> list:
@@ -14,10 +12,9 @@ def get_album_by_id(album_id: int) -> list:
     Returns:
         list: A list of album records matching the given ID.
     """
-    query = f"SELECT * FROM Album WHERE AlbumId = {album_id}"
+    query = f"SELECT * FROM album WHERE album_id = {album_id}"
     result = execute_query(query)
     return result
-
 
 @tool
 def get_albums_by_artist_name(artist_name: str) -> list:
@@ -32,13 +29,12 @@ def get_albums_by_artist_name(artist_name: str) -> list:
     """
     query = f"""
         SELECT Album.*
-        FROM Album
-        JOIN Artist ON Album.ArtistId = Artist.ArtistId
-        WHERE Artist.Name LIKE '%{artist_name}%'
+        FROM album
+        JOIN Artist ON Album.artist_id = Artist.artist_id
+        WHERE Artist.name LIKE '%{artist_name}%'
     """
     result = execute_query(query)
     return result
-
 
 @tool
 def get_albums_by_title(album_title: str) -> list:
@@ -52,12 +48,11 @@ def get_albums_by_title(album_title: str) -> list:
         list: A list of albums with titles that match the given string.
     """
     query = f"""
-        SELECT * FROM Album
-        WHERE Title LIKE '%{album_title}%'
+        SELECT * FROM album
+        WHERE title LIKE '%{album_title}%'
     """
     result = execute_query(query)
     return result
-
 
 @tool
 def insert_album(title: str, artist_id: int) -> None:
@@ -69,11 +64,10 @@ def insert_album(title: str, artist_id: int) -> None:
         artist_id (int): The ID of the artist who created the album.
     """
     query = f"""
-        INSERT INTO Album (Title, ArtistId)
+        INSERT INTO Album (title, artist_id)
         VALUES ('{title}', {artist_id})
     """
     execute_query(query)
-
 
 @tool
 def update_album(album_id: int, title: str, artist_id: int) -> None:
@@ -87,11 +81,10 @@ def update_album(album_id: int, title: str, artist_id: int) -> None:
     """
     query = f"""
         UPDATE Album
-        SET Title = '{title}', ArtistId = {artist_id}
-        WHERE AlbumId = {album_id}
+        SET title = '{title}', artist_id = {artist_id}
+        WHERE album_id = {album_id}
     """
     execute_query(query)
-
 
 @tool
 def delete_album(album_id: int) -> None:
@@ -101,5 +94,5 @@ def delete_album(album_id: int) -> None:
     Args:
         album_id (int): The ID of the album to delete.
     """
-    query = f"DELETE FROM Album WHERE AlbumId = {album_id}"
+    query = f"DELETE FROM album WHERE album_id = {album_id}"
     execute_query(query)

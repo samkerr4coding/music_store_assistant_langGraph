@@ -644,27 +644,27 @@ functions = [
             }
         }
     },
-    {
-        "name": "get_playlists_by_name",
-        "description": "Retrieve all playlists from the database whose names match the given string.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "playlist_name": {
-                    "type": "string",
-                    "description": "The name of the playlist to search for."
-                }
-            },
-            "required": ["playlist_name"]
-        },
-        "returns": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "description": "A list of playlists whose names match the given string."
-            }
-        }
-    },
+    # {
+    #     "name": "get_playlists_by_name",
+    #     "description": "Retrieve all playlists from the database whose names match the given string.",
+    #     "parameters": {
+    #         "type": "object",
+    #         "properties": {
+    #             "playlist_name": {
+    #                 "type": "string",
+    #                 "description": "The name of the playlist to search for."
+    #             }
+    #         },
+    #         "required": ["playlist_name"]
+    #     },
+    #     "returns": {
+    #         "type": "array",
+    #         "items": {
+    #             "type": "object",
+    #             "description": "A list of playlists whose names match the given string."
+    #         }
+    #     }
+    # },
     {
         "name": "insert_playlist",
         "description": "Insert a new playlist into the database.",
@@ -718,6 +718,111 @@ functions = [
         },
         "returns": {
             "type": "null"
+        }
+    },
+{
+        "name": "get_playlists_by_composer_name",
+        "description": "Retrieve playlists containing tracks by a given composer.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "artist_name": {
+                    "type": "string",
+                    "description": "The name of the artist to search for."
+                }
+            },
+            "required": ["artist_name"]
+        },
+        "returns": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "description": "A list of playlists containing tracks by the given artist."
+            }
+        }
+    },
+    {
+        "name": "get_playlists_by_song_name",
+        "description": "Retrieve playlists containing a specific song.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "song_name": {
+                    "type": "string",
+                    "description": "The name of the song to search for."
+                }
+            },
+            "required": ["song_name"]
+        },
+        "returns": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "description": "A list of playlists containing the specified song."
+            }
+        }
+    },
+    {
+        "name": "get_playlists_by_genre",
+        "description": "Retrieve playlists containing tracks of a specific genre.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "genre_name": {
+                    "type": "string",
+                    "description": "The name of the genre to search for."
+                }
+            },
+            "required": ["genre_name"]
+        },
+        "returns": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "description": "A list of playlists containing tracks of the specified genre."
+            }
+        }
+    },
+    {
+        "name": "get_playlists_by_album_name",
+        "description": "Retrieve playlists containing tracks from a specific album.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "album_name": {
+                    "type": "string",
+                    "description": "The name of the album to search for."
+                }
+            },
+            "required": ["album_name"]
+        },
+        "returns": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "description": "A list of playlists containing tracks from the specified album."
+            }
+        }
+    },
+    {
+        "name": "get_playlists_by_playlist_name",
+        "description": "Retrieve playlists matching a specific name.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "playlist_name": {
+                    "type": "string",
+                    "description": "The name of the playlist to search for."
+                }
+            },
+            "required": ["playlist_name"]
+        },
+        "returns": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "description": "A list of playlists matching the specified name."
+            }
         }
     },
     {

@@ -1,7 +1,5 @@
 from langchain_core.tools import tool
-
 from utils.db_util import execute_query
-
 
 @tool
 def get_invoice_line_by_id(invoice_line_id: int) -> list:
@@ -14,10 +12,9 @@ def get_invoice_line_by_id(invoice_line_id: int) -> list:
     Returns:
         list: A list of invoice line records matching the given ID.
     """
-    query = f"SELECT * FROM InvoiceLine WHERE InvoiceLineId = {invoice_line_id}"
+    query = f"SELECT * FROM invoice_line WHERE invoice_line_id = {invoice_line_id}"
     result = execute_query(query)
     return result
-
 
 @tool
 def get_invoice_lines_by_invoice_id(invoice_id: int) -> list:
@@ -31,12 +28,11 @@ def get_invoice_lines_by_invoice_id(invoice_id: int) -> list:
         list: A list of invoice lines associated with the given invoice ID.
     """
     query = f"""
-        SELECT * FROM InvoiceLine
-        WHERE InvoiceId = {invoice_id}
+        SELECT * FROM invoice_line
+        WHERE invoice_id = {invoice_id}
     """
     result = execute_query(query)
     return result
-
 
 @tool
 def insert_invoice_line(invoice_id: int, track_id: int, unit_price: float, quantity: int) -> None:
@@ -50,11 +46,10 @@ def insert_invoice_line(invoice_id: int, track_id: int, unit_price: float, quant
         quantity (int): The quantity of the track purchased.
     """
     query = f"""
-        INSERT INTO InvoiceLine (InvoiceId, TrackId, UnitPrice, Quantity)
+        INSERT INTO invoice_line (invoice_id, track_id, unit_price, quantity)
         VALUES ({invoice_id}, {track_id}, {unit_price}, {quantity})
     """
     execute_query(query)
-
 
 @tool
 def update_invoice_line(invoice_line_id: int, invoice_id: int, track_id: int, unit_price: float, quantity: int) -> None:
@@ -69,12 +64,11 @@ def update_invoice_line(invoice_line_id: int, invoice_id: int, track_id: int, un
         quantity (int): The new quantity of the track purchased.
     """
     query = f"""
-        UPDATE InvoiceLine
-        SET InvoiceId = {invoice_id}, TrackId = {track_id}, UnitPrice = {unit_price}, Quantity = {quantity}
-        WHERE InvoiceLineId = {invoice_line_id}
+        UPDATE invoice_line
+        SET invoice_id = {invoice_id}, track_id = {track_id}, unit_price = {unit_price}, quantity = {quantity}
+        WHERE invoice_line_id = {invoice_line_id}
     """
     execute_query(query)
-
 
 @tool
 def delete_invoice_line(invoice_line_id: int) -> None:
@@ -84,5 +78,5 @@ def delete_invoice_line(invoice_line_id: int) -> None:
     Args:
         invoice_line_id (int): The ID of the invoice line to delete.
     """
-    query = f"DELETE FROM InvoiceLine WHERE InvoiceLineId = {invoice_line_id}"
+    query = f"DELETE FROM invoice_line WHERE invoice_line_id = {invoice_line_id}"
     execute_query(query)

@@ -1,7 +1,5 @@
 from langchain_core.tools import tool
-
 from utils.db_util import execute_query
-
 
 @tool
 def get_customer_by_id(customer_id: int) -> list:
@@ -14,10 +12,9 @@ def get_customer_by_id(customer_id: int) -> list:
     Returns:
         list: A list of customer records matching the given ID.
     """
-    query = f"SELECT * FROM Customer WHERE CustomerId = {customer_id}"
+    query = f"SELECT * FROM Customer WHERE customer_id = {customer_id}"
     result = execute_query(query)
     return result
-
 
 @tool
 def get_customers_by_name(customer_name: str) -> list:
@@ -32,11 +29,10 @@ def get_customers_by_name(customer_name: str) -> list:
     """
     query = f"""
         SELECT * FROM Customer
-        WHERE FirstName LIKE '%{customer_name}%' OR LastName LIKE '%{customer_name}%'
+        WHERE first_name LIKE '%{customer_name}%' OR last_name LIKE '%{customer_name}%'
     """
     result = execute_query(query)
     return result
-
 
 @tool
 def get_customers_by_email(email: str) -> list:
@@ -51,11 +47,10 @@ def get_customers_by_email(email: str) -> list:
     """
     query = f"""
         SELECT * FROM Customer
-        WHERE Email LIKE '%{email}%'
+        WHERE email LIKE '%{email}%'
     """
     result = execute_query(query)
     return result
-
 
 @tool
 def insert_customer(first_name: str, last_name: str, company: str, address: str, city: str, state: str, country: str,
@@ -78,11 +73,10 @@ def insert_customer(first_name: str, last_name: str, company: str, address: str,
         support_rep_id (int): The ID of the support representative assigned to the customer.
     """
     query = f"""
-        INSERT INTO Customer (FirstName, LastName, Company, Address, City, State, Country, PostalCode, Phone, Fax, Email, SupportRepId)
+        INSERT INTO Customer (first_name, last_name, company, address, city, state, country, postal_code, phone, fax, email, support_rep_id)
         VALUES ('{first_name}', '{last_name}', '{company}', '{address}', '{city}', '{state}', '{country}', '{postal_code}', '{phone}', '{fax}', '{email}', {support_rep_id})
     """
     execute_query(query)
-
 
 @tool
 def update_customer(customer_id: int, first_name: str, last_name: str, company: str, address: str, city: str,
@@ -108,11 +102,10 @@ def update_customer(customer_id: int, first_name: str, last_name: str, company: 
     """
     query = f"""
         UPDATE Customer
-        SET FirstName = '{first_name}', LastName = '{last_name}', Company = '{company}', Address = '{address}', City = '{city}', State = '{state}', Country = '{country}', PostalCode = '{postal_code}', Phone = '{phone}', Fax = '{fax}', Email = '{email}', SupportRepId = {support_rep_id}
-        WHERE CustomerId = {customer_id}
+        SET first_name = '{first_name}', last_name = '{last_name}', company = '{company}', address = '{address}', city = '{city}', state = '{state}', country = '{country}', postal_code = '{postal_code}', phone = '{phone}', fax = '{fax}', email = '{email}', support_rep_id = {support_rep_id}
+        WHERE customer_id = {customer_id}
     """
     execute_query(query)
-
 
 @tool
 def delete_customer(customer_id: int) -> None:
@@ -122,5 +115,5 @@ def delete_customer(customer_id: int) -> None:
     Args:
         customer_id (int): The ID of the customer to delete.
     """
-    query = f"DELETE FROM Customer WHERE CustomerId = {customer_id}"
+    query = f"DELETE FROM Customer WHERE customer_id = {customer_id}"
     execute_query(query)

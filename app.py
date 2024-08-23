@@ -1,7 +1,6 @@
 """
 Simple demo of integration with ChainLit and LangGraph.
 """
-import sqlite3
 
 import chainlit as cl
 from dotenv import load_dotenv
@@ -25,17 +24,10 @@ load_dotenv()
 #  - one to handle employee
 #  - on to handle audit tracking
 
-def init_db():
-    conn = sqlite3.connect("Chinook_Sqlite.sqlite")
-    return conn
-
 
 
 @cl.on_chat_start
 async def on_chat_start():
-    conn = init_db()
-    cl.user_session.set("db_conn", conn)
-
     graph_builder = StateGraph(State)
     # start graph
     graph_builder.add_node("chatbot", Assistant(part_1_assistant_runnable))
