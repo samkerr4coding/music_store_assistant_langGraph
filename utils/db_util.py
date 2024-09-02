@@ -1,13 +1,12 @@
 import psycopg2
 from psycopg2 import sql
 
-
 def execute_query(query: str) -> list:
     """
-    Executes a SQL query against the PostgreSQL database and returns the results as a list of dictionaries.
+    Executes a SQL query against the PostgreSQL database and returns the results if applicable.
 
     :param query: The SQL query string to execute.
-    :return: A list of dictionaries where each dictionary represents a row in the result set.
+    :return: A list of dictionaries for SELECT queries, or an empty list for non-returning queries.
     """
     conn = None
     result = []
@@ -23,14 +22,20 @@ def execute_query(query: str) -> list:
 
         cursor = conn.cursor()
         cursor.execute(query)
-        rows = cursor.fetchall()
-        columns = [desc[0] for desc in cursor.description]
 
-        # Convert query result to a list of dictionaries
-        result = [dict(zip(columns, row)) for row in rows]
+        # Check if the query is a SELECT query
+        if query.strip().lower().startswith("select"):
+            rows = cursor.fetchall()
+            columns = [desc[0] for desc in cursor.description]
+            result = [dict(zip(columns, row)) for row in rows]
+        else:
+            # For INSERT, UPDATE, DELETE, or other non-SELECT queries, commit the transaction
+            conn.commit()
 
     except psycopg2.Error as e:
         print(f"An error occurred: {e}")
+        if conn:
+            conn.rollback()  # Rollback in case of error during a transaction
 
     finally:
         if cursor:

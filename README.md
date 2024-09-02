@@ -2,10 +2,13 @@
 
 ## Summary
 
+
+Welcome to myMusicStore, this is a demo of the usage of tool calling with :
+
 langgraph 
 langchain tools
 llm
-sqlite chinook db
+postgresql
 chainlit
 
 ## Installation
@@ -43,4 +46,19 @@ chainlit run app.py --port 8000
 ```
 
 ## Author
-Kerroumi Samir samir.kerr@gmail.com
+
+
+invoice_line_tools.py
+album_tools.py
+artist_tools.py
+country_tools.py
+employee_tools.py
+invoice_tools.py
+media_type_tools.py
+playlist_tools.py
+track_tools.py
+policy.py
+policy.md
+genre_tools.py
+
+

@@ -47,8 +47,6 @@ volumes:
   db:
     driver: local
 
-
-
 networks:
   custom_network:
     name : custom_network

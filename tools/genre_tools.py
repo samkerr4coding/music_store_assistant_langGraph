@@ -74,3 +74,14 @@ def delete_genre(genre_id: int) -> None:
     """
     query = f"DELETE FROM genre WHERE genre_id = {genre_id}"
     execute_query(query)
+
+@tool
+def delete_genre_by_name(genre_name: str) -> None:
+    """
+    Delete a genre from the database based on its name.
+
+    Args:
+        genre_str (str): The name of the genre to delete.
+    """
+    query = f"DELETE FROM genre WHERE name = '{genre_name}'"
+    execute_query(query)

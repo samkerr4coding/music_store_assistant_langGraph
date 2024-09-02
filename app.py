@@ -1,11 +1,14 @@
 """
 Simple demo of integration with ChainLit and LangGraph.
 """
+import datetime
+import uuid
 
 import chainlit as cl
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage
 from langchain_core.runnables import Runnable
+from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import StateGraph
 from langgraph.prebuilt import tools_condition
 
@@ -14,6 +17,7 @@ from model.state import State
 from utils.utils import create_tool_node_with_fallback
 
 load_dotenv()
+# TODO : create a starter prompt presenting the assistant with its possibilites
 # TODO : use Gemini
 # TODO : use Google search tools
 # TODO : enhance tools + add playlist track tool
@@ -41,8 +45,10 @@ async def on_chat_start():
     graph_builder.add_edge("tools", "chatbot")
     graph_builder.set_entry_point("chatbot")
     # TODO : Use checkpointer
+    memory = MemorySaver()
+
     graph = graph_builder.compile(
-        # checkpointer=memory,
+        checkpointer=memory,
         # This is new!
         # interrupt_before=["tools"],
         # Note: can also interrupt __after__ actions, if desired.
@@ -73,9 +79,10 @@ async def on_message(message: cl.Message):
     ui_message = cl.Message(content="")
     await ui_message.send()
 
-
+    config = await get_config()
+    
     # TODO : review the way messages are passed
-    async for event in graph.astream_events(latest_message_state, version="v1"):
+    async for event in graph.astream_events(latest_message_state, config,  version="v1"):
         kind = event["event"]
         if kind == "on_chat_model_stream":
             if event["event"] == "on_chat_model_stream" and event["name"] == "llm": # event["name"] == "AzureChatOpenAI": #and event["name"] == "chat_llama3":
@@ -94,6 +101,17 @@ async def on_message(message: cl.Message):
 
 
     await ui_message.update()
+
+
+async def get_config():
+    config = {
+        "configurable": {
+            "thread_id": uuid.uuid4(),
+            "thread_ts": datetime.datetime.timestamp(datetime.datetime.now())
+        }
+    }
+    return config
+
 
 if __name__ == "__main__":
     from chainlit.cli import run_chainlit

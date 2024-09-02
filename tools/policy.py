@@ -1,41 +1,56 @@
-import re
-
 import numpy as np
-import openai
+import re
 from langchain_core.tools import tool
-
-
+from langchain_ollama import OllamaEmbeddings
 
 class VectorStoreRetriever:
-    def __init__(self, doc: str, vectors: list, oai_client):
-        self._arr = np.array(vectors)
-        self._client = oai_client
+    def __init__(self, docs: list, vectors: list, ollama_client):
+        self._docs = docs
+        self._arr = np.array(vectors).astype("float32")
+        self._client = ollama_client
 
     @classmethod
-    def from_markdow(cls, oai_client):
-        with open("policy.md", 'r', encoding='utf-8') as f:
+    def from_markdown(cls, ollama_client):
+        # Read the markdown file
+        with open("./tools/policy.md", 'r', encoding='utf-8') as f:
             markdown_content = f.read()
-        embeddings = oai_client.embeddings.create(
-            model="text-embedding-3-small", input=markdown_content
-        )
-        vectors = [emb.embedding for emb in embeddings.data]
-        return cls(vectors, oai_client)
+
+        # Split markdown content into sections
+        sections = markdown_content.split("\n")
+
+        # Generate embeddings for the document sections
+        embeddings = cls._embed_text(sections, ollama_client)
+        vectors = [embedding for embedding in embeddings]  # Flatten the list of lists
+
+        return cls(sections, vectors, ollama_client)
+
+    @staticmethod
+    def _embed_text(text_list, ollama_client):
+        # Generate embeddings using Ollama client
+        embeddings = ollama_client.embed_documents(text_list)
+        return embeddings
 
     def query(self, query: str, k: int = 5) -> list[dict]:
-        embed = self._client.embeddings.create(
-            model="text-embedding-3-small", input=[query]
-        )
-        # "@" is just a matrix multiplication in python
-        scores = np.array(embed.data[0].embedding) @ self._arr.T
+        # Generate embedding for the query
+        query_embedding = self._client.embed_documents([query])[0]
+
+        # Calculate scores using matrix multiplication
+        scores = np.array(query_embedding) @ self._arr.T
+
+        # Get top k indices
         top_k_idx = np.argpartition(scores, -k)[-k:]
         top_k_idx_sorted = top_k_idx[np.argsort(-scores[top_k_idx])]
+
+        # Return the most relevant documents
         return [
             {**self._docs[idx], "similarity": scores[idx]} for idx in top_k_idx_sorted
         ]
 
+# Initialize the Ollama client
+ollama_client = OllamaEmbeddings(model="nomic-embed-text")
 
-retriever = VectorStoreRetriever.from_markdow(openai.Client())
-
+# Initialize the retriever with documents and embeddings
+retriever = VectorStoreRetriever.from_markdown(ollama_client)
 
 @tool
 def lookup_policy(query: str) -> str:

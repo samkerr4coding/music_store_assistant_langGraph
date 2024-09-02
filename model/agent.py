@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 from typing import List, Callable
 
-
+from langchain.memory import ConversationBufferMemory
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import Runnable, RunnableConfig
@@ -10,6 +10,7 @@ from langchain_core.tools import render_text_description
 from langchain_experimental.llms.ollama_functions import OllamaFunctions
 from langchain_ollama import ChatOllama
 from langchain_openai import AzureChatOpenAI, ChatOpenAI
+from openai import OpenAI
 
 from model.state import State
 
@@ -23,6 +24,7 @@ from tools.invoice_line_tools import *
 from tools.invoice_tools import *
 from tools.media_type_tools import *
 from tools.playlist_tools import *
+from tools.policy import lookup_policy
 from tools.track_tools import *
 
 
@@ -47,6 +49,7 @@ class Assistant:
         return {"messages": result}
 
 
+conversation_memory = ConversationBufferMemory()
 # Haiku is faster and cheaper, but less accurate
 # llm = ChatAnthropic(model="claude-3-haiku-20240307")
 # llm = ChatOllama(name="llm", model="llama3.1", stop=[
@@ -57,16 +60,19 @@ class Assistant:
 #     ])
 
 if os.environ.get('LOCAL_LLM') == "true":
-    llm = ChatOllama(
+    llm = ChatOpenAI(
+        api_key="ollama",
+        base_url="http://localhost:11434/v1",
         name="llm",
-        model=os.environ.get("LOCAL_LLM_OLLAMA_MODEL"),
-        baseUrl="http://localhost:11434")
+        model="llama3.1")
 else:
     llm = AzureChatOpenAI(
         azure_deployment=os.environ.get('AZURE_OPENAI_DEPLOYEMENT_NAME'),  # Replace with your custom LLM URL
         api_version=os.environ.get('AZURE_OPENAI_API_VERSION'),
         name="llm"
     )
+
+
 
 # llm = ChatOpenAI(
 #    openai_api_key="no token",
@@ -77,6 +83,7 @@ else:
 
 
 search_tool = [TavilySearchResults(max_results=2)]
+policy_tool = [lookup_policy]
 # Track Tools
 track_tools = [
     get_track_by_id,
@@ -162,7 +169,8 @@ genre_tools = [
     get_genres_by_name,
     insert_genre,
     update_genre,
-    delete_genre
+    delete_genre,
+    delete_genre_by_name
 ]
 
 # MediaType Tools
@@ -177,6 +185,7 @@ media_type_tools = [
 # Combine all tools into one list
 all_tools = (
         search_tool +
+        policy_tool +
         track_tools +
         album_tools +
         artist_tools +
@@ -212,7 +221,6 @@ primary_assistant_prompt = ChatPromptTemplate.from_messages(
         ("placeholder", "{messages}"),
     ]
 ).partial(time=datetime.now())
-
 
 
 if os.environ.get('LOCAL_LLM') == "true":
