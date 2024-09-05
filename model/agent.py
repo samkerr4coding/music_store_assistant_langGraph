@@ -50,27 +50,12 @@ class Assistant:
 
 
 conversation_memory = ConversationBufferMemory()
-# Haiku is faster and cheaper, but less accurate
-# llm = ChatAnthropic(model="claude-3-haiku-20240307")
-# llm = ChatOllama(name="llm", model="llama3.1", stop=[
-#         "<|start_header_id|>",
-#         "<|end_header_id|>",
-#         "<|eot_id|>",
-#         "<|reserved_special_token"
-#     ])
 
-if os.environ.get('LOCAL_LLM') == "true":
-    llm = ChatOpenAI(
-        api_key="ollama",
-        base_url="http://localhost:11434/v1",
-        name="llm",
-        model="llama3.1")
-else:
-    llm = AzureChatOpenAI(
+llm = AzureChatOpenAI(
         azure_deployment=os.environ.get('AZURE_OPENAI_DEPLOYEMENT_NAME'),  # Replace with your custom LLM URL
         api_version=os.environ.get('AZURE_OPENAI_API_VERSION'),
         name="llm"
-    )
+)
 
 
 
@@ -222,65 +207,6 @@ primary_assistant_prompt = ChatPromptTemplate.from_messages(
     ]
 ).partial(time=datetime.now())
 
-
-if os.environ.get('LOCAL_LLM') == "true":
-    part_1_assistant_runnable = primary_assistant_prompt | llm.bind_tools(
-        tools=functions,
-        function_call=[
-                        {"name": "get_track_by_id"},
-                        {"name": "get_tracks_by_album_title"},
-                        {"name": "get_tracks_by_artist_name"},
-                        {"name": "insert_track"},
-                        {"name": "update_track"},
-                        {"name": "delete_track"},
-                        {"name": "get_album_by_id"},
-                        {"name": "get_albums_by_artist_name"},
-                        {"name": "get_albums_by_title"},
-                        {"name": "insert_album"},
-                        {"name": "update_album"},
-                        {"name": "delete_album"},
-                        {"name": "get_artist_by_id"},
-                        {"name": "get_artist_by_name"},
-                        {"name": "insert_artist"},
-                        {"name": "update_artist"},
-                        {"name": "delete_artist"},
-                        {"name": "get_customer_by_id"},
-                        {"name": "get_customers_by_name"},
-                        {"name": "get_customers_by_email"},
-                        {"name": "insert_customer"},
-                        {"name": "update_customer"},
-                        {"name": "delete_customer"},
-                        {"name": "get_invoice_by_id"},
-                        {"name": "get_invoices_by_customer_name"},
-                        {"name": "insert_invoice"},
-                        {"name": "update_invoice"},
-                        {"name": "delete_invoice"},
-                        {"name": "get_employee_by_id"},
-                        {"name": "get_employees_by_name"},
-                        {"name": "insert_employee"},
-                        {"name": "update_employee"},
-                        {"name": "delete_employee"},
-                        {"name": "get_playlist_by_id"},
-                        {"name": "insert_playlist"},
-                        {"name": "update_playlist"},
-                        {"name": "delete_playlist"},
-                        {"name": "get_playlists_by_composer_name"},
-                        {"name": "get_playlists_by_song_name"},
-                        {"name": "get_playlists_by_genre"},
-                        {"name": "get_playlists_by_album_name"},
-                        {"name": "get_playlists_by_playlist_name"},
-                        {"name": "get_invoice_line_by_id"},
-                        {"name": "get_invoice_lines_by_invoice_id"},
-                        {"name": "insert_invoice_line"},
-                        {"name": "update_invoice_line"},
-                        {"name": "delete_invoice_line"},
-                        {"name": "get_genre_by_id"},
-                        {"name": "get_genres_by_name"},
-                        {"name": "insert_genre"},
-                        {"name": "update_genre"},
-                        {"name": "delete_genre"}]
-                            )
-else:
-    part_1_assistant_runnable = primary_assistant_prompt | llm.bind_tools(tools)
+part_1_assistant_runnable = primary_assistant_prompt | llm.bind_tools(tools)
 
 

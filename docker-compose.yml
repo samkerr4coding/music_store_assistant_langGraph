@@ -1,24 +1,6 @@
 version: "3.8"
 
 services:
-  # Local LLM Service
-  ollama:
-      container_name: ollama
-      env_file:
-        - .env
-      build:
-        context: .
-        dockerfile: Dockerfile.ollama
-      ports:
-        - "11434:11434"
-      volumes:
-        - ./ollama/ollama:/root/.ollama
-      pull_policy: always
-      tty: true
-      restart: always
-      networks:
-        - custom_network
-
   db:
       container_name: db
       image: postgres:14.1-alpine
@@ -34,6 +16,7 @@ services:
 
   # Python Application Service
   app:
+    container_name: music_store_assistant
     build: .  # Build the context from current directory
     ports:
       - "8000:8000"  # Port for your application (adjust if needed)
