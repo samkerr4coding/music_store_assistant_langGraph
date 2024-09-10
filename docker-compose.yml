@@ -1,8 +1,8 @@
 version: "3.8"
 
 services:
-  db:
-      container_name: db
+  music_store_db:
+      container_name: music_store_db
       image: postgres:14.1-alpine
       restart: always
       environment:
@@ -12,7 +12,10 @@ services:
         - '5432:5432'
       volumes:
         - db:/var/lib/postgresql/data
-        - ./db-init/db.sql:/docker-entrypoint-initdb.d/db.sql
+        - ./db-init/01_model.sql:/docker-entrypoint-initdb.d/01_model.sql
+        - ./db-init/02_data.sql:/docker-entrypoint-initdb.d/02_data.sql
+      networks:
+        - custom_network
 
   # Python Application Service
   app:
@@ -21,10 +24,12 @@ services:
     ports:
       - "8000:8000"  # Port for your application (adjust if needed)
     depends_on:
-      - db
+      - music_store_db
     volumes:
       - ./:/app  # Mount your application directory
-    command: python app.py
+    command: chainlit run app.py --host=0.0.0.0 --port=8000
+    networks:
+      - custom_network
 
 volumes:
   db:

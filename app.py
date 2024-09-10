@@ -6,7 +6,7 @@ import uuid
 
 import chainlit as cl
 from dotenv import load_dotenv
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, ToolMessage
 from langchain_core.runnables import Runnable
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import StateGraph
@@ -17,21 +17,14 @@ from model.state import State
 from utils.utils import create_tool_node_with_fallback
 
 load_dotenv()
-# TODO : create a starter prompt presenting the assistant with its possibilites
-# TODO : use Gemini
-# TODO : use Google search tools
-# TODO : enhance tools + add playlist track tool
-# TODO : multi node agents with :
-#  - one to search on the web
-#  - one to handle songs tracks etc
-#  - one to handle customer , invoices etcs
-#  - one to handle employee
-#  - on to handle audit tracking
-
+# TODO : Enhance prompt template
+# TODO : Add context memory
+# TODO : Human in the loop
 
 
 @cl.on_chat_start
 async def on_chat_start():
+    print("startting chat")
     graph_builder = StateGraph(State)
     # start graph
     graph_builder.add_node("chatbot", Assistant(part_1_assistant_runnable))
@@ -56,10 +49,10 @@ async def on_chat_start():
     )
     # initialize state
     state = State(messages=[])
+
     # save graph and state to the user session
     cl.user_session.set("graph", graph)
     cl.user_session.set("state", state)
-
 
 @cl.on_message
 async def on_message(message: cl.Message):
@@ -98,8 +91,6 @@ async def on_message(message: cl.Message):
             print(f"Done tool: {event['name']}")
             print(f"Tool output was: {event['data'].get('output')}")
             print("--")
-
-
     await ui_message.update()
 
 

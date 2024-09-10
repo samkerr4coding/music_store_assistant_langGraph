@@ -1,6 +1,12 @@
+import os
+
 import psycopg2
 from psycopg2 import sql
 
+from langchain_core.tools import tool
+
+
+@tool
 def execute_query(query: str) -> list:
     """
     Executes a SQL query against the PostgreSQL database and returns the results if applicable.
@@ -13,11 +19,11 @@ def execute_query(query: str) -> list:
     try:
         # Connect to your PostgreSQL database
         conn = psycopg2.connect(
-            dbname="chinook_auto_increment",  # Replace with your database name
-            user="postgres",  # Replace with your database user
-            password="postgres",  # Replace with your password
-            host="localhost",  # Your host
-            port="5432"  # Your port
+            dbname=os.environ.get('PG_DB_NAME'),  # Replace with your database name
+            user=os.environ.get('PG_USERNAME'),  # Replace with your database user
+            password=os.environ.get('PG_PASSWORD'),  # Replace with your password
+            host=os.environ.get('PG_HOST'),  # Your host
+            port=os.environ.get('PG_PORT')  # Your port
         )
 
         cursor = conn.cursor()
