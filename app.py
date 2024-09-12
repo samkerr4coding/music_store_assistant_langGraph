@@ -24,7 +24,6 @@ load_dotenv()
 
 @cl.on_chat_start
 async def on_chat_start():
-    print("startting chat")
     graph_builder = StateGraph(State)
     # start graph
     graph_builder.add_node("chatbot", Assistant(part_1_assistant_runnable))
@@ -50,15 +49,20 @@ async def on_chat_start():
     # initialize state
     state = State(messages=[])
 
+    # one config per conversation
+    config = await get_config()
     # save graph and state to the user session
     cl.user_session.set("graph", graph)
     cl.user_session.set("state", state)
+    cl.user_session.set("config", config)
+
 
 @cl.on_message
 async def on_message(message: cl.Message):
     # Retrieve the graph and state from the user session
     graph: Runnable = cl.user_session.get("graph")
     state = cl.user_session.get("state")
+    config = cl.user_session.get("config")
 
     # Append the new message to the state
     state["messages"].append(HumanMessage(content=message.content))
@@ -72,13 +76,11 @@ async def on_message(message: cl.Message):
     ui_message = cl.Message(content="")
     await ui_message.send()
 
-    config = await get_config()
-    
     # TODO : review the way messages are passed
     async for event in graph.astream_events(latest_message_state, config,  version="v1"):
         kind = event["event"]
         if kind == "on_chat_model_stream":
-            if event["event"] == "on_chat_model_stream" and event["name"] == "llm": # event["name"] == "AzureChatOpenAI": #and event["name"] == "chat_llama3":
+            if event["event"] == "on_chat_model_stream" and event["name"] == "llm":
                 content = event["data"]["chunk"].content or ""
                 await ui_message.stream_token(token=content)
                 print(content, end="|")
@@ -95,14 +97,7 @@ async def on_message(message: cl.Message):
 
 
 async def get_config():
-    config = {
-        "configurable": {
-            "thread_id": uuid.uuid4(),
-            "thread_ts": datetime.datetime.timestamp(datetime.datetime.now())
-        }
-    }
-    return config
-
+    return {"configurable": {"thread_id": uuid.uuid4()}}
 
 if __name__ == "__main__":
     from chainlit.cli import run_chainlit

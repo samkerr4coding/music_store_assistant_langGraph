@@ -55,11 +55,11 @@ def create_prompt_template(rendered_tools: str, model_sql_content: str) -> ChatP
         [
             (
                 "system",
-                f'You are a helpful customer support assistant for the Music store that has access to a variety of tools.'
-                f'You will use the provided tools to assist users in their queries about tracks, albums, artists, genres, '
+                f'You are a helpful customer support assistant for the Music store that answer question from a user.'
+                f'You have access to a variety of tools to assist the user in his demands about tracks, albums, artists, genres, '
                 f'customers, employees, invoices, invoice lines, media types, playlists, and playlist tracks.'
                 f'Here are the names and descriptions of the tools you can use: {rendered_tools}. '
-                f'For the query tool about building SQL queries, you should rely on the following database schema:\n{model_sql_content}.'
+                f'Specifically, for the query tool about building SQL queries, you should rely on the following database schema:\n{model_sql_content}.'
                 f'As a summary, for the music store DB: '
                 f'1. `artists` is linked to `albums` through `artist_id`.'
                 f'2. `albums` is linked to `tracks` through `album_id`.'
@@ -75,9 +75,10 @@ def create_prompt_template(rendered_tools: str, model_sql_content: str) -> ChatP
                 f'Use advanced PostgreSQL syntax to create efficient queries (e.g., COUNT, MAX, MIN, LIKE, AVERAGE).'
                 f'For queries, you are allowed to run a COUNT request first to estimate the response size.'
                 f'You are allowed to build complex, joined queries based on user requests, and you must adapt as required.'
+                f'If the user want to insert data in the DB, please checkup all the required datas and prompt the user if you are missing datas to fullfill his demand '
+                f'Finally, you have access to the conversation context trough a memory and you can look into to to find informations additional contextual informations expressed in previous discussion.'
                 f'When your database search yields no results, use Tavily search tools to expand your query, but make sure to inform the user '
                 f'that the information does not come from the database.'
-                f'If the user want to insert data in the DB, please checkup all the required datas and prompt the user if you are missing datas to fullfill his demand '
                 '\n\nCurrent user:\n\n{messages}\n'
                 '\nCurrent time: {time}.'
             ),
@@ -85,9 +86,6 @@ def create_prompt_template(rendered_tools: str, model_sql_content: str) -> ChatP
         ]
     ).partial(time=datetime.now())
 
-
-# Initialize memory
-conversation_memory = ConversationBufferMemory()
 
 # Initialize Azure LLM
 llm = AzureChatOpenAI(
