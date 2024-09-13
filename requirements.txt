@@ -1,7 +1,6 @@
 chainlit
 langchain
 langchain_openai
-langchain-ollama
 langchain-experimental
 langchain_community
 langgraph
@@ -9,4 +8,4 @@ psycopg2-binary
 numpy
 openai~=1.40.0
 python-dotenv
-faiss-cpu
+spacy

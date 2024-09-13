@@ -6,7 +6,7 @@ import uuid
 
 import chainlit as cl
 from dotenv import load_dotenv
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, ToolMessage
 from langchain_core.runnables import Runnable
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import StateGraph
@@ -17,17 +17,9 @@ from model.state import State
 from utils.utils import create_tool_node_with_fallback
 
 load_dotenv()
-# TODO : create a starter prompt presenting the assistant with its possibilites
-# TODO : use Gemini
-# TODO : use Google search tools
-# TODO : enhance tools + add playlist track tool
-# TODO : multi node agents with :
-#  - one to search on the web
-#  - one to handle songs tracks etc
-#  - one to handle customer , invoices etcs
-#  - one to handle employee
-#  - on to handle audit tracking
-
+# TODO : Enhance prompt template
+# TODO : Add context memory
+# TODO : Human in the loop
 
 
 @cl.on_chat_start
@@ -56,9 +48,13 @@ async def on_chat_start():
     )
     # initialize state
     state = State(messages=[])
+
+    # one config per conversation
+    config = await get_config()
     # save graph and state to the user session
     cl.user_session.set("graph", graph)
     cl.user_session.set("state", state)
+    cl.user_session.set("config", config)
 
 
 @cl.on_message
@@ -66,6 +62,7 @@ async def on_message(message: cl.Message):
     # Retrieve the graph and state from the user session
     graph: Runnable = cl.user_session.get("graph")
     state = cl.user_session.get("state")
+    config = cl.user_session.get("config")
 
     # Append the new message to the state
     state["messages"].append(HumanMessage(content=message.content))
@@ -79,13 +76,11 @@ async def on_message(message: cl.Message):
     ui_message = cl.Message(content="")
     await ui_message.send()
 
-    config = await get_config()
-    
     # TODO : review the way messages are passed
     async for event in graph.astream_events(latest_message_state, config,  version="v1"):
         kind = event["event"]
         if kind == "on_chat_model_stream":
-            if event["event"] == "on_chat_model_stream" and event["name"] == "llm": # event["name"] == "AzureChatOpenAI": #and event["name"] == "chat_llama3":
+            if event["event"] == "on_chat_model_stream" and event["name"] == "llm":
                 content = event["data"]["chunk"].content or ""
                 await ui_message.stream_token(token=content)
                 print(content, end="|")
@@ -98,20 +93,11 @@ async def on_message(message: cl.Message):
             print(f"Done tool: {event['name']}")
             print(f"Tool output was: {event['data'].get('output')}")
             print("--")
-
-
     await ui_message.update()
 
 
 async def get_config():
-    config = {
-        "configurable": {
-            "thread_id": uuid.uuid4(),
-            "thread_ts": datetime.datetime.timestamp(datetime.datetime.now())
-        }
-    }
-    return config
-
+    return {"configurable": {"thread_id": uuid.uuid4()}}
 
 if __name__ == "__main__":
     from chainlit.cli import run_chainlit
